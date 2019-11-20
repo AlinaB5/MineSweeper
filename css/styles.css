@@ -29,5 +29,24 @@ background-color: white;
 .smiley {
     width: 30px;
     height: auto;
+    display: inline-block;
+}
+.clock {
+    width:30px;
+    height: 30px;
+    display: inline-block;
+    border: 2px solid black;
+    text-align: center;
+    line-height:30px;
+    margin-inline-start: 10px;
 }
 
+.beginnerButton{
+    margin-top : 10px;
+}
+.mediumButton{
+    margin-top : 10px;
+}
+.expertButton{
+    margin-top : 10px;
+}

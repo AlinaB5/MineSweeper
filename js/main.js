@@ -19,21 +19,32 @@ var gGame = {
 }
 
 var gBoard; //Matrix contains cell objects  
-var gMines = [];
-var gNumOfminesToReveal = gLevel.mines
-
-function initGame(size=gLevel.size, mines=gLevel.mines) {
+var gNumOfminesToReveal;
+var gClockInterval = null;
+var gStartTime;
+function initGame(size = gLevel.size, mines = gLevel.mines) {
     //create the board, all cells are hidden 
     gGame.isOn = true;
+    gGame.secsPassed = 0;
     gLevel.size = size
     gLevel.mines = mines
+    gNumOfminesToReveal = gLevel.mines
     buildBoard();
     renderBoard();
-    plantMines();
-    setMinesNegsCount();
+    clearInterval(gClockInterval);
+    gClockInterval = null;
+
     var elRestartButton = document.querySelector('.restart');
     elRestartButton.innerHTML = `<img class="smiley"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-open-mouth_1f603.png" />`;
+}
+
+function clock() {
+    var timePassed = Date.now() - gStartTime;
+    // timePassed = Math.floor(timePassed/1000)
+    gGame.secsPassed = Math.floor(timePassed / 1000)
+    var elClock = document.querySelector('.clock');
+    elClock.innerText = gGame.secsPassed
 }
 
 function buildBoard() { // TODO putting it in utils.
@@ -49,28 +60,22 @@ function buildBoard() { // TODO putting it in utils.
             gBoard[i][j] = createCell(i, j);
         }
     }
-    console.table(gBoard);
-    // gBoard[0][1].isMine = true;
-    // gBoard[0][3].isMine = true;
 
     return gBoard;
 }
 
-function plantMines() {
+function plantMines() { debugger
     for (var i = 0; i < gLevel.mines; i++) {
         var mineLocation = getRandomLocation();
         //if it wasn't a mine before put it there 
         if (!gBoard[mineLocation.i][mineLocation.j].isMine) {
             gBoard[mineLocation.i][mineLocation.j].isMine = true
-            gMines.push(mineLocation);
 
         } else {
             i--
         }
     }
 }
-console.log(gMines)
-
 
 function createCell(i, j) {  // TODO move to utils maybe 
     var cellObj = {
@@ -123,10 +128,10 @@ function renderBoard(board) {     // Render the board as a <table> to the page
                 if (cell.isMine) {
                     strHTML += `\t<td data-i=${i}  data-j=${j} class="${className}" >${MINE}</td>\n`
                 } else {
-                    if(cell.minesAroundCount>0){
-                    strHTML += `\t<td data-i=${i}  data-j=${j} class="${className}">${cell.minesAroundCount}</td>\n`
-                    }else {
-                        strHTML +=  `\t<td data-i=${i}  data-j=${j} class="${className}"></td>\n`
+                    if (cell.minesAroundCount > 0) {
+                        strHTML += `\t<td data-i=${i}  data-j=${j} class="${className}">${cell.minesAroundCount}</td>\n`
+                    } else {
+                        strHTML += `\t<td data-i=${i}  data-j=${j} class="${className}"></td>\n`
                     }
                 }
             } else {
@@ -147,6 +152,12 @@ function renderBoard(board) {     // Render the board as a <table> to the page
 
 function cellClicked(event, cellI, cellJ) {
     if (gGame.isOn) {
+        if (!gClockInterval) {
+            gStartTime = Date.now();
+            gClockInterval = setInterval(clock, 100); 
+            plantMines(); 
+            setMinesNegsCount();
+        }
         if (event.button === 2) return cellMarked(cellI, cellJ);
         // gFirstClick = true 
         // if(gFirstClick) {
@@ -154,7 +165,9 @@ function cellClicked(event, cellI, cellJ) {
         //     setMinesNegsCount();
         // }
         // Called when a cell (td) is clicked
+        
         var cell = gBoard[cellI][cellJ];
+        if(cell.isMarked) return;
         cell.isShown = true;
         if (cell.isMine) gameOver();
         if (cell.minesAroundCount === 0) expandShown(cellI, cellJ);
@@ -187,9 +200,10 @@ function cellMarked(cellI, cellJ) { //Called on right click to mark a cell (susp
     //if the cell was marked before, remove the mark
     if (gBoard[cellI][cellJ].isMarked) {
         gBoard[cellI][cellJ].isMarked = false;
+        gNumOfminesToReveal++;
     } else {
         gBoard[cellI][cellJ].isMarked = true;
-        if (gBoard[cellI][cellJ].isMine && gNumOfminesToReveal>0) gNumOfminesToReveal--
+        if ( gNumOfminesToReveal > 0) gNumOfminesToReveal--
     }
     checkGameOver()
     renderBoard();
@@ -217,14 +231,14 @@ function checkGameOver() {
 
 function gameOver(won) {
     console.log('gameOver')
+    gGame.isOn = false;
+    clearInterval(gClockInterval);
     var elRestartButton = document.querySelector('.restart');
     if (won) {
         elRestartButton.innerHTML = `<img class="smiley"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-sunglasses_1f60e.png" />`;
     } else {
-        gGame.isOn = false;
         revealMines();
-        gNumOfminesToReveal = 0;
         elRestartButton.innerHTML = `<img class="smiley"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/dizzy-face_1f635.png" />`;
     }
@@ -232,9 +246,13 @@ function gameOver(won) {
 
 function revealMines() {
     if (!gGame.isOn) {
-        for (var i = 0; i < gMines.length; i++) {
-            var mineLocation = gMines[i];
-            gBoard[mineLocation.i][mineLocation.j].isShown = true;
+        for (var i = 0; i < gBoard.length; i++) {
+            for (var j = 0; j < gBoard[i].length; j++) {
+                //if its a mine that isn't shown  isShown = true 
+                if (!gBoard[i][j].isShown && gBoard[i][j].isMine) gBoard[i][j].isShown = true;
+            }
         }
+
     }
+    renderBoard();
 }
