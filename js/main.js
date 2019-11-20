@@ -64,7 +64,7 @@ function buildBoard() { // TODO putting it in utils.
     return gBoard;
 }
 
-function plantMines() { debugger
+function plantMines() {
     for (var i = 0; i < gLevel.mines; i++) {
         var mineLocation = getRandomLocation();
         //if it wasn't a mine before put it there 
@@ -148,14 +148,16 @@ function renderBoard(board) {     // Render the board as a <table> to the page
     elBoard.innerHTML = strHTML;
     var elNumOfminesToReveal = document.querySelector('.numOfminesToReveal');
     elNumOfminesToReveal.innerText = gNumOfminesToReveal
+    var elClock = document.querySelector('.clock');
+    elClock.innerText = gGame.secsPassed;
 }
 
 function cellClicked(event, cellI, cellJ) {
     if (gGame.isOn) {
         if (!gClockInterval) {
             gStartTime = Date.now();
-            gClockInterval = setInterval(clock, 100); 
-            plantMines(); 
+            gClockInterval = setInterval(clock, 100);
+            plantMines();
             setMinesNegsCount();
         }
         if (event.button === 2) return cellMarked(cellI, cellJ);
@@ -165,9 +167,9 @@ function cellClicked(event, cellI, cellJ) {
         //     setMinesNegsCount();
         // }
         // Called when a cell (td) is clicked
-        
+
         var cell = gBoard[cellI][cellJ];
-        if(cell.isMarked) return;
+        if (cell.isMarked) return;
         cell.isShown = true;
         if (cell.isMine) gameOver();
         if (cell.minesAroundCount === 0) expandShown(cellI, cellJ);
@@ -203,7 +205,7 @@ function cellMarked(cellI, cellJ) { //Called on right click to mark a cell (susp
         gNumOfminesToReveal++;
     } else {
         gBoard[cellI][cellJ].isMarked = true;
-        if ( gNumOfminesToReveal > 0) gNumOfminesToReveal--
+        if (gNumOfminesToReveal > 0) gNumOfminesToReveal--
     }
     checkGameOver()
     renderBoard();
