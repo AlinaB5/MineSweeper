@@ -1,11 +1,23 @@
 body{
     background-color: rgb(222, 236, 235);
+    background-image: url("/images/white-board-on-beige-surface-1089842.jpg");
+    font-family:Arial;
+	font-size:15px;
+    font-weight:bold;
+    color:#686262;
+    
 }
 .topHeading {
+    font-family: 'Raleway', sans-serif;
+    color:#acc9b4;
     display: flex;
     align-items: center;    
     justify-content: center;
     margin: 20px 10px;
+    -webkit-text-stroke-width: 1px;
+   -webkit-text-stroke-color: black;
+   font-size: 40px;
+
 }
 .boardContainer{
     display: flex;
@@ -16,30 +28,39 @@ body{
 
 .boardContainer td {
     border:solid 1px black;
+    border-radius: 3px;
     width: 30px;
     height: 30px;
     text-align: center;
     transition: .5s;
-    background-color: lightblue;
+    background-color: rgb(194, 214, 196);
 }
 
 td.SHOWN{
-background-color: white;
+    background-color: white;
 }
+
+td.TEMP_SHOWN{
+    background-color: white;
+    }
 
 .topMenu {
     display: flex;
     align-items: center;    
     justify-content: center;
-    margin: 10px;
+    text-align: center;
     border: 2px solid#325d63;
+    width:150px;
+    margin:auto;
+    background-color:#ffffffbe;
+    border:1px solid rgb(202, 230, 224);
+    border-radius: 6px;
 }
 
 .numOfminesToReveal{
     width:30px;
     height: 30px;
     display: inline-block;
-    border: 2px solid black;
     text-align: center;
     line-height:30px;
     margin-inline-end: 10px;
@@ -48,6 +69,9 @@ background-color: white;
 .restart{
     width: 45px;
     border: none;
+    cursor:pointer;
+    background-color: Transparent;
+    background-repeat:no-repeat;
 }
 
 .smileyButton {
@@ -61,13 +85,54 @@ background-color: white;
     width:30px;
     height: 30px;
     display: inline-block;
-    border: 2px solid black;
     text-align: center;
     line-height:30px;
     margin-inline-start: 10px;
 }
 
+.hints_lives{
+    display: flex;
+    align-items: center;    
+    justify-content: center;
+    text-align: center;
+    
+}
 
+
+
+.hints{
+    border: 2px solid#325d63;
+    width:60px;
+    height: 20px;
+    
+    margin-top: 10px;
+    background-color:#ffffffbe;
+    border:1px solid rgb(202, 230, 224);
+    border-radius: 6px;
+}
+
+.lives {
+    border: 2px solid#325d63;
+    width:60px;
+    height: 20px;
+   
+    margin-top: 10px;
+    background-color:#ffffffbe;
+    border:1px solid rgb(202, 230, 224);
+    border-radius: 6px;
+}
+
+.hint1{
+    cursor:pointer;
+}
+
+.hint2{
+    cursor:pointer;
+}
+
+.hint3{
+    cursor:pointer;
+}
 .levelsButtons{
     display: flex;
     align-items: center;    
