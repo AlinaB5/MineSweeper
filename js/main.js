@@ -23,7 +23,7 @@ var gBoard,
     gNumOfminesToReveal,
     gClockInterval = null,
     gStartTime,
-    gUsedHintsCount = 0;
+    gUsedHintsCount;
 
 
 function initGame(size = gLevel.size, mines = gLevel.mines, hints = gLevel.hints) {
@@ -34,6 +34,7 @@ function initGame(size = gLevel.size, mines = gLevel.mines, hints = gLevel.hints
     gLevel.mines = mines;
     gLevel.hints = hints;
     gNumOfminesToReveal = gLevel.mines
+    gUsedHintsCount = 0;
     buildBoard();
     renderBoard();
     clearInterval(gClockInterval);
@@ -138,11 +139,10 @@ function cellClicked(event, cellI, cellJ) {
             cell.isShown = true;
         }
 
-        if (cell.isMine) {
-            if (gGame.lives > 0 && !gGame.hintMode) {
-                gGame.lives--;
-                generateLives();
-            } else {
+        if (cell.isMine && !gGame.hintMode) {
+            gGame.lives--;
+            generateLives();
+            if (gGame.lives === 0) {
                 gameOver();
             }
         }
