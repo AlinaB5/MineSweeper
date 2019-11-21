@@ -31,8 +31,8 @@ function countMinesAround(pos) {
   return neighborsCount;
 }
 
-// generate random number 
 
+// generate random number 
 function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
@@ -44,4 +44,13 @@ function getRandomLocation() {
       j: getRandomNumber(0, gLevel.size - 1)
   };
   return location
+}
+
+
+function clock() {
+  var timePassed = Date.now() - gStartTime;
+  // timePassed = Math.floor(timePassed/1000)
+  gGame.secsPassed = Math.floor(timePassed / 1000)
+  var elClock = document.querySelector('.clock');
+  elClock.innerText = gGame.secsPassed
 }

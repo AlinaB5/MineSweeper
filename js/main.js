@@ -22,6 +22,7 @@ var gBoard; //Matrix contains cell objects
 var gNumOfminesToReveal;
 var gClockInterval = null;
 var gStartTime;
+
 function initGame(size = gLevel.size, mines = gLevel.mines) {
     //create the board, all cells are hidden 
     gGame.isOn = true;
@@ -35,51 +36,23 @@ function initGame(size = gLevel.size, mines = gLevel.mines) {
     gClockInterval = null;
 
     var elRestartButton = document.querySelector('.restart');
-    elRestartButton.innerHTML = `<img class="smiley"
+    elRestartButton.innerHTML = `<img class="smileyButton"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-open-mouth_1f603.png" />`;
 }
 
-function clock() {
-    var timePassed = Date.now() - gStartTime;
-    // timePassed = Math.floor(timePassed/1000)
-    gGame.secsPassed = Math.floor(timePassed / 1000)
-    var elClock = document.querySelector('.clock');
-    elClock.innerText = gGame.secsPassed
-}
-
 function buildBoard() { // TODO putting it in utils.
-
-    //Builds the board (gets size from gLevel.size )
-    // Set mines at random locations (gets numOfMines from gLevel.mines)
-    // Call setMinesNegsCount()
-    // Return the created board
     gBoard = [];
     for (var i = 0; i < gLevel.size; i++) {
         gBoard.push([])
         for (var j = 0; j < gLevel.size; j++) {
-            gBoard[i][j] = createCell(i, j);
+            gBoard[i][j] = createCell();
         }
     }
-
     return gBoard;
 }
 
-function plantMines() {
-    for (var i = 0; i < gLevel.mines; i++) {
-        var mineLocation = getRandomLocation();
-        //if it wasn't a mine before put it there 
-        if (!gBoard[mineLocation.i][mineLocation.j].isMine) {
-            gBoard[mineLocation.i][mineLocation.j].isMine = true
-
-        } else {
-            i--
-        }
-    }
-}
-
-function createCell(i, j) {  // TODO move to utils maybe 
+function createCell() {  // TODO move to utils maybe 
     var cellObj = {
-        location: { i, j },
         isShown: false,
         isMine: false,
         isMarked: false,
@@ -87,34 +60,43 @@ function createCell(i, j) {  // TODO move to utils maybe
     return cellObj;
 }
 
+function plantMines(firstCellI,firstCellJ) {
+    for (var i = 0; i < gLevel.mines; i++) {
+        var mineLocation = getRandomLocation(); 
+        //if it wasn't a mine before put it there and is not the first clicked 
+        if (!gBoard[mineLocation.i][mineLocation.j].isMine && gBoard[mineLocation.i][mineLocation.j] !== gBoard[firstCellI][firstCellJ]) {
+            gBoard[mineLocation.i][mineLocation.j].isMine = true
+        } else {
+            i--;
+        }
+    }
+}
 
 function setMinesNegsCount() {// Count mines around each cell and set the cell's minesAroundCount //TODO move to utils maybe 
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[i].length; j++) {
-            var cell = gBoard[i][j];
-            cell.minesAroundCount = countMinesAround(cell);
+            var cell = gBoard[i][j]
+            cell.minesAroundCount = countMinesAround(i,j);
         }
     }
 }
+
 // cell.minesAroundCount = setMinesNegsCount()
-function countMinesAround(cell) {
+function countMinesAround(cellI,cellJ) {
     var minesCount = 0;
-    for (var i = cell.location.i - 1; i <= cell.location.i + 1; i++) {
-        // if i is out of boundaries - go to the next i
-        if (i < 0 || i >= gBoard.length) continue; //continue to the next i
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= gBoard.length) continue;
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j >= gBoard[0].length) continue;
 
-        for (var j = cell.location.j - 1; j <= cell.location.j + 1; j++) {
-            // if j is out of boundaries - go to the next j:
-            if (j < 0 || j >= gBoard[0].length) continue; // continue to the next j.
-
-            if (i === cell.location.i && j === cell.location.j) continue;
+            if (i === cellI && j === cellJ) continue;
             if (gBoard[i][j].isMine) minesCount++;
         }
     }
     return minesCount;
 }
 
-function renderBoard(board) {     // Render the board as a <table> to the page 
+function renderBoard() {
     var strHTML = '';
     for (var i = 0; i < gBoard.length; i++) {
         strHTML += '<tr>\n';
@@ -157,16 +139,10 @@ function cellClicked(event, cellI, cellJ) {
         if (!gClockInterval) {
             gStartTime = Date.now();
             gClockInterval = setInterval(clock, 100);
-            plantMines();
+            plantMines(cellI,cellJ);
             setMinesNegsCount();
         }
         if (event.button === 2) return cellMarked(cellI, cellJ);
-        // gFirstClick = true 
-        // if(gFirstClick) {
-        //     plantMines();
-        //     setMinesNegsCount();
-        // }
-        // Called when a cell (td) is clicked
 
         var cell = gBoard[cellI][cellJ];
         if (cell.isMarked) return;
@@ -182,12 +158,11 @@ function expandShown(cellI, cellJ) {
     // When user clicks a cell with no mines around, we need to open not only that cell, but also its neighbors.
     // NOTE: start with a basic implementation that only opens the non-mine 1st degree neighbors
     for (var i = cellI - 1; i <= cellI + 1; i++) {
-        // if i is out of boundaries - go to the next i
-        if (i < 0 || i >= gBoard.length) continue; //continue to the next i
+        if (i < 0 || i >= gBoard.length) continue;
 
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
-            // if j is out of boundaries - go to the next j:
-            if (j < 0 || j >= gBoard[0].length) continue; // continue to the next j.
+
+            if (j < 0 || j >= gBoard[0].length) continue;
 
             if (i === cellI && j === cellJ) continue;
             if (!gBoard[i][j].isMine) gBoard[i][j].isShown = true//cellClicked(i, j);
@@ -196,7 +171,6 @@ function expandShown(cellI, cellJ) {
     }
 
 }
-
 
 function cellMarked(cellI, cellJ) { //Called on right click to mark a cell (suspected to be a mine) 
     //if the cell was marked before, remove the mark
@@ -237,11 +211,11 @@ function gameOver(won) {
     clearInterval(gClockInterval);
     var elRestartButton = document.querySelector('.restart');
     if (won) {
-        elRestartButton.innerHTML = `<img class="smiley"
+        elRestartButton.innerHTML = `<img class="smileyButton"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-sunglasses_1f60e.png" />`;
     } else {
         revealMines();
-        elRestartButton.innerHTML = `<img class="smiley"
+        elRestartButton.innerHTML = `<img class="smileyButton"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/dizzy-face_1f635.png" />`;
     }
 }
@@ -254,7 +228,6 @@ function revealMines() {
                 if (!gBoard[i][j].isShown && gBoard[i][j].isMine) gBoard[i][j].isShown = true;
             }
         }
-
-    }
-    renderBoard();
+        renderBoard();
+    }  
 }

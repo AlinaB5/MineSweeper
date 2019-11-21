@@ -10,16 +10,20 @@
 </head>
 
 <body oncontextmenu="return false;" onload="initGame()">
-    <h1>Mine Sweeper</h1>
-    <div class="numOfminesToReveal"></div>
-    <button class="restart" onclick="initGame()"></button>
-    <div class = "clock"></div>
+    <h1 class = "topHeading">Mines Sweeper</h1>
+    <div class= "topMenu">
+        <div class="numOfminesToReveal"></div>
+        <button class="restart" onclick="initGame()"></button>
+        <div class="clock"></div>
+    </div>
     <table class="boardContainer">
         <tbody></tbody>
     </table>
-    <button class="beginnerButton" onclick="initGame(4,2)">Beginner</button>
-    <button class="mediumButton" onclick="initGame(8,12)">Medium</button>
-    <button class="expertButton" onclick="initGame(12,30)">Expert</button>
+    <div class = "levelsButtons">
+        <button class="beginnerButton" onclick="initGame(4,2)">Beginner</button>
+        <button class="mediumButton" onclick="initGame(8,12)">Medium</button>
+        <button class="expertButton" onclick="initGame(12,30)">Expert</button>
+    </div>
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
 </body>
