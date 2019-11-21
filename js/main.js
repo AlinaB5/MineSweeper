@@ -141,9 +141,9 @@ function cellClicked(event, cellI, cellJ) {
 
         if (cell.isMine && !gGame.hintMode) {
             gGame.lives--;
-            generateLives();
-            if (gGame.lives === 0) {
-                gameOver();
+            generateLives(); 
+            if (gGame.lives === 0) { 
+                gameOver(false);
             }
         }
 
