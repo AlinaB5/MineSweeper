@@ -9,7 +9,6 @@ var gLevel = {
     size: 4,
     mines: 2,
     hints: 3,
-    lives: 3
 };
 
 var gGame = {
@@ -17,7 +16,8 @@ var gGame = {
     shownCount: 0,
     markedCount: 0,
     secsPassed: 0,
-    hintMode: false
+    hintMode: false,
+    lives: 3
 }
 
 var gBoard; //Matrix contains cell objects  
@@ -26,9 +26,11 @@ var gClockInterval = null;
 var gStartTime;
 var gUsedHintsCount = 0;
 
+
 function initGame(size = gLevel.size, mines = gLevel.mines, hints = gLevel.hints) {
     gGame.isOn = true;
     gGame.secsPassed = 0;
+    gGame.lives = 3;
     gLevel.size = size;
     gLevel.mines = mines;
     gLevel.hints = hints;
@@ -37,12 +39,11 @@ function initGame(size = gLevel.size, mines = gLevel.mines, hints = gLevel.hints
     renderBoard();
     clearInterval(gClockInterval);
     gClockInterval = null;
-    var elHintsDiv = document.querySelector('.hints');
-    elHintsDiv.innerText = '';
 
     var elRestartButton = document.querySelector('.restart');
     elRestartButton.innerHTML = `<img class="smileyButton"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-open-mouth_1f603.png" />`;
+    createLives();
     createHints();
 }
 
@@ -160,10 +161,22 @@ function cellClicked(event, cellI, cellJ) {
             cell.isShown = true;
         }
 
-        if (cell.isMine) gameOver();
+        if (cell.isMine) {
+            if (gGame.lives > 1) {
+                gGame.lives--;
+                createLives();
+                cellMarked(cellI, cellJ)
+            } else {
+                var elLivesDiv = document.querySelector('.lives');
+                elLivesDiv.innerText = '0 left';
+                gameOver();
+            }
+        }
+
         if (cell.minesAroundCount === 0 || gGame.hintMode) expandShown(cellI, cellJ);
-        checkGameOver()
-        renderBoard()
+
+        checkGameOver();
+        renderBoard();
     }
 }
 
@@ -210,9 +223,10 @@ function checkGameOver() {
                 //if there are not shown
                 if (!gBoard[i][j].isShown) {
                     //if its a mine and not marked game is still on
-                    if (gBoard[i][j].isMine && !gBoard[i][j].isMarked) gameWon = false;
+                    if (gBoard[i][j].isMine) {
+                        if (!gBoard[i][j].isMarked) gameWon = false;
+                    } else gameWon = false;
                     //if its not a mine and not shown game is still on
-                    else gameWon = false;
                 }
             }
         }
@@ -224,16 +238,21 @@ function gameOver(won) {
     if (gGame.hintMode) return
     console.log('gameOver')
     gGame.isOn = false;
-    clearInterval(gClockInterval);
     var elRestartButton = document.querySelector('.restart');
     if (won) {
+        var audioWon = new Audio('/sounds/Cheering.mp3');
+        audioWon.play();
+        
         elRestartButton.innerHTML = `<img class="smileyButton"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-sunglasses_1f60e.png" />`;
     } else {
         revealMines();
+        var audioLost = new Audio('/sounds/Bomb.mp3');
+        audioLost.play();
         elRestartButton.innerHTML = `<img class="smileyButton"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/dizzy-face_1f635.png" />`;
     }
+    clearInterval(gClockInterval);
 }
 
 function revealMines() {
@@ -253,7 +272,7 @@ function activateHintMode(elHint) {
     gUsedHintsCount++;
     var elHintsDiv = document.querySelector('.hints');
     if (gGame.isOn) elHint.innerText = '';
-    if (gUsedHintsCount === gLevel.hints) elHintsDiv.innerText = '0 left'
+    if (gUsedHintsCount === gLevel.hints) elHintsDiv.innerText = '0 left';
 }
 
 function hideRevealedByHint(cellI, cellJ) {
@@ -263,7 +282,6 @@ function hideRevealedByHint(cellI, cellJ) {
             for (var j = cellJ - 1; j <= cellJ + 1; j++) {
                 if (j < 0 || j >= gBoard[0].length) continue;
                 if (gBoard[i][j].tempShown) {
-
                     gBoard[i][j].tempShown = false;
                 }
             }
@@ -275,7 +293,20 @@ function hideRevealedByHint(cellI, cellJ) {
 
 function createHints() {
     var elHintsDiv = document.querySelector('.hints');
+    elHintsDiv.innerText = '';
     for (var i = 1; i <= gLevel.hints; i++) {
         elHintsDiv.innerHTML += `<span class='hint${i}' onclick='activateHintMode(this)'>💡</span>`;
     }
+}
+
+function createLives() {
+    var elLivesDiv = document.querySelector('.lives');
+    elLivesDiv.innerText = '';
+    // if (gGame.lives === 1) elLivesDiv.innerText = '0 left';
+    // else {
+    for (var i = 0; i < gGame.lives; i++) {
+        elLivesDiv.innerHTML += `<span>❤️</span>`;
+    }
+    // }
+    renderBoard();
 }
