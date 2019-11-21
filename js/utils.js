@@ -36,11 +36,16 @@ function createHints() {
   }
 }
 
-function createLives() {
+function generateLives() {
   var elLivesDiv = document.querySelector('.lives');
   elLivesDiv.innerText = '';
-  for (var i = 0; i < gGame.lives; i++) {
-    elLivesDiv.innerHTML += `<span>❤️</span>`;
+
+  if (gGame.lives === 0) {
+    elLivesDiv.innerText = '0 left';
+  } else {
+    for (var i = 1; i <= gGame.lives; i++) {
+      elLivesDiv.innerHTML += `<span>❤️</span>`;
+    }
   }
   renderBoard();
 }

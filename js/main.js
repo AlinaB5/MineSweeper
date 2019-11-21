@@ -42,7 +42,7 @@ function initGame(size = gLevel.size, mines = gLevel.mines, hints = gLevel.hints
     var elRestartButton = document.querySelector('.restart');
     elRestartButton.innerHTML = `<img class="smileyButton"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-open-mouth_1f603.png" />`;
-    createLives();
+    generateLives();
     createHints();
 }
 
@@ -94,19 +94,19 @@ function renderBoard() {
 
             if (cell.isShown || cell.tempShown) {
                 if (cell.isMine) {
-                    strHTML += `\t<td data-i=${i}  data-j=${j} class="${className}" >${MINE}</td>\n`
+                    strHTML += `\t<td class="${className}" >${MINE}</td>\n`
                 } else {
                     if (cell.minesAroundCount > 0) {
-                        strHTML += `\t<td data-i=${i}  data-j=${j} class="${className}">${cell.minesAroundCount}</td>\n`
+                        strHTML += `\t<td class="${className}">${cell.minesAroundCount}</td>\n`
                     } else {
-                        strHTML += `\t<td data-i=${i}  data-j=${j} class="${className}"></td>\n`
+                        strHTML += `\t<td class="${className}"></td>\n`
                     }
                 }
             } else {
                 if (cell.isMarked) {
-                    strHTML += `\t<td data-i=${i}  data-j=${j} class="${className}" onmousedown="cellClicked(event,${i}, ${j})">${FLAG}</td>\n`
+                    strHTML += `\t<td class="${className}" onmousedown="cellClicked(event,${i}, ${j})">${FLAG}</td>\n`
                 } else {
-                    strHTML += `\t<td data-i=${i}  data-j=${j} class="${className}" onmousedown="cellClicked(event,${i}, ${j})"></td>\n`
+                    strHTML += `\t<td class="${className}" onmousedown="cellClicked(event,${i}, ${j})"></td>\n`
                 }
             }
         }
@@ -139,13 +139,10 @@ function cellClicked(event, cellI, cellJ) {
         }
 
         if (cell.isMine) {
-            if (gGame.lives > 1) {
+            if (gGame.lives > 0 && !gGame.hintMode) {
                 gGame.lives--;
-                createLives();
-                cellMarked(cellI, cellJ)
+                generateLives();
             } else {
-                var elLivesDiv = document.querySelector('.lives');
-                elLivesDiv.innerText = '0 left';
                 gameOver();
             }
         }
@@ -212,7 +209,7 @@ function gameOver(isWon) {
     gGame.isOn = false;
     var elRestartButton = document.querySelector('.restart');
     if (isWon) {
-
+        localStorageMang();
         var audioWon = new Audio('/sounds/Cheering.mp3');
         audioWon.play();
         elRestartButton.innerHTML = `<img class="smileyButton" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-sunglasses_1f60e.png" />`;
@@ -259,4 +256,20 @@ function hideRevealedByHint(cellI, cellJ) {
         gGame.hintMode = false;
         renderBoard()
     }, 1000);
+}
+
+function localStorageMang() {
+    switch (gLevel.size) {
+        case 4:
+            localStorage.setItem(`Best Time Beginner`, gGame.secsPassed)
+            break;
+        case 8:
+            localStorage.setItem(`Best Time Medium`, gGame.secsPassed)
+            break;
+        case 12:
+            localStorage.setItem(`Best Time Expert`, gGame.secsPassed)
+            break;
+        default:
+            break;
+    }
 }
