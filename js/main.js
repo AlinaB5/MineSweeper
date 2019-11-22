@@ -136,7 +136,7 @@ function cellClicked(event, cellI, cellJ) {
         if (cell.isMarked) return;
         if (gGame.hintMode) {
             cell.tempShown = true;
-        } else {
+        } else if (!cell.isShown) {
             cell.isShown = true;
         }
 
@@ -165,7 +165,10 @@ function expandShown(cellI, cellJ) {
 
             if (i === cellI && j === cellJ) continue;
             if (!gGame.hintMode) {
-                if (!gBoard[i][j].isMine) gBoard[i][j].isShown = true
+                if (!gBoard[i][j].isMine && !gBoard[i][j].isShown) {
+                    gBoard[i][j].isShown = true
+                    if (gBoard[i][j].minesAroundCount === 0) expandShown(i, j);
+                }
             } else {
                 gBoard[i][j].tempShown = true;
                 hideRevealedByHint(cellI, cellJ)
@@ -227,7 +230,6 @@ function revealMines() {
     if (!gGame.isOn) {
         for (var i = 0; i < gBoard.length; i++) {
             for (var j = 0; j < gBoard[i].length; j++) {
-                //if its a mine that isn't shown  isShown = true 
                 if (!gBoard[i][j].isShown && gBoard[i][j].isMine) gBoard[i][j].isShown = true;
             }
         }
