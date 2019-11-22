@@ -46,7 +46,8 @@ function createCell() {
     isShown: false,
     isMine: false,
     isMarked: false,
-    tempShown: false
+    tempShown: false,
+    isSafe:false
   }
   return cellObj;
 }
@@ -120,3 +121,4 @@ function getAndSetBestTime() {
       break;
   }
 }
+

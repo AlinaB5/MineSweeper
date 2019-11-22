@@ -14,7 +14,8 @@ var gGame = {
     markedCount: 0,
     secsPassed: 0,
     hintMode: false,
-    lives: 0
+    lives: 0,
+    safeClicks: 0,
 }
 
 var gBoard,
@@ -30,6 +31,7 @@ function initGame(size = gLevel.size) {
     setLevel(size)
     gGame.secsPassed = 0;
     gGame.lives = 3;
+    gGame.safeClicks = 3;
     gUsedHintsCount = 0;
     buildBoard();
     renderBoard();
@@ -40,6 +42,9 @@ function initGame(size = gLevel.size) {
     var elRestartButton = document.querySelector('.restart');
     elRestartButton.innerHTML = `<img class="smileyButton"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-open-mouth_1f603.png" />`;
+    var elSafeClickButn = document.querySelector('.safeClickButn');
+    elSafeClickButn.innerText = `You have ${gGame.safeClicks} safe clicks`
+    elSafeClickButn.disabled =false;
 }
 
 function findPossibleMineLocs(firstI, firstJ) {
@@ -93,6 +98,7 @@ function renderBoard() {
             className += (cell.tempShown) ? 'TEMP_SHOWN' : '';
             className += (cell.isMine) ? ' MINE' : '';
             className += (cell.isMarked) ? ' MARKED' : '';
+            className += (cell.isSafe) ? 'SAFE' : '';
 
             if (cell.isShown || cell.tempShown) {
                 if (cell.isMine) {
@@ -107,7 +113,11 @@ function renderBoard() {
             } else {
                 if (cell.isMarked) {
                     strHTML += `\t<td class="${className}" onmousedown="cellClicked(event,${i}, ${j})">${FLAG}</td>\n`
-                } else {
+                }
+                // else if (cell.isSafe) {
+                //     strHTML += `\t<td class="${className}" onmousedown="cellClicked(event,${i}, ${j})"></td>\n`
+                // } 
+                else {
                     strHTML += `\t<td class="${className}" onmousedown="cellClicked(event,${i}, ${j})"></td>\n`
                 }
             }
@@ -261,4 +271,29 @@ function hideRevealedByHint(cellI, cellJ) {
     }, 1000);
 }
 
+function showSafeClick() {
+    var elSafeClickButn = document.querySelector('.safeClickButn');
+    gGame.safeClicks--;
+    if (gGame.safeClicks >= 0) {
+        elSafeClickButn.innerText = `You have ${gGame.safeClicks} safe clicks`
+        if (gGame.safeClicks === 0) elSafeClickButn.disabled =true;
+        var possibleSafeClicks = getSafeClicks();
+        var randLocForSafeClick = getRandomLoc(possibleSafeClicks);
+        randLocForSafeClick.isSafe = true;
+        setTimeout(function () {
+            randLocForSafeClick.isSafe = false;
+            renderBoard();
+        }, 500)
+        renderBoard();
+    }
+}
 
+function getSafeClicks() {-+++++++++++++++++-
+    var possibleSafeClicks = []
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[i].length; j++) {
+            if (!gBoard[i][j].isShown && !gBoard[i][j].isMine) possibleSafeClicks.push(gBoard[i][j])
+        }
+    }
+    return possibleSafeClicks;
+}

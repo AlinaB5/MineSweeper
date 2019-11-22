@@ -8,7 +8,7 @@ body {
     font-size: 15px;
     font-weight: bold;
     color: #686262;
-    margin-top:100px;
+    margin-top: 100px;
 }
 
 .topHeading {
@@ -17,7 +17,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 20px 10px ;
+    margin: 20px 10px;
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: black;
     font-size: 45px;
@@ -48,12 +48,15 @@ td.TEMP_SHOWN {
     background-color: white;
 }
 
+td.SAFE {
+    background-color: rgb(87, 133, 83);
+}
+
 .bestTime {
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    border: 2px solid#325d63;
     width: 250px;
     margin: auto;
     margin-bottom: 10px;
@@ -67,7 +70,6 @@ td.TEMP_SHOWN {
     align-items: center;
     justify-content: center;
     text-align: center;
-    border: 2px solid#325d63;
     width: 150px;
     margin: auto;
     background-color: #ffffffbe;
@@ -116,7 +118,6 @@ td.TEMP_SHOWN {
 }
 
 .hints {
-    border: 2px solid#325d63;
     width: 60px;
     height: 20px;
     margin-top: 10px;
@@ -124,6 +125,7 @@ td.TEMP_SHOWN {
     border: 1px solid rgb(202, 230, 224);
     border-radius: 6px;
 }
+
 
 .lives {
     border: 2px solid#325d63;
@@ -136,6 +138,28 @@ td.TEMP_SHOWN {
     border-radius: 6px;
 }
 
+.divSafeClickButn{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 10px;
+}
+
+.safeClickButn {
+    box-shadow: inset 0px 1px 0px 0px #ffffff;
+    background: linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
+    background-color: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #5eaab8;
+    cursor: pointer;
+    color: #666666;
+    font-family: Arial;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 6px 24px;
+    text-decoration: none;
+    text-shadow: 0px 1px 0px #ffffff;
+}
 .hint1 {
     cursor: pointer;
 }
