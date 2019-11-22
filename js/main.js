@@ -5,9 +5,7 @@ var MINE = '💣',
     FLAG = '🏁';
 
 var gLevel = {
-    size: 4,
-    mines: 3,
-    hints: 3,
+    size: 4
 };
 
 var gGame = {
@@ -20,31 +18,28 @@ var gGame = {
 }
 
 var gBoard,
-    gNumOfminesToReveal,
     gClockInterval = null,
     gStartTime,
-    gUsedHintsCount;
+    gUsedHintsCount,
+    gBestBeginnerTime,
+    gBestMediumTime,
+    gBestExpertTime;
 
-
-function initGame(size = gLevel.size, mines = gLevel.mines, hints = gLevel.hints) {
+function initGame(size=gLevel.size) {
     gGame.isOn = true;
+    setLevel(size)
     gGame.secsPassed = 0;
     gGame.lives = 3;
-    gLevel.size = size;
-    gLevel.mines = mines;
-    gLevel.hints = hints;
-    gNumOfminesToReveal = gLevel.mines
     gUsedHintsCount = 0;
     buildBoard();
     renderBoard();
     clearInterval(gClockInterval);
     gClockInterval = null;
-
+    generateLives();
+    createHints();
     var elRestartButton = document.querySelector('.restart');
     elRestartButton.innerHTML = `<img class="smileyButton"
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-open-mouth_1f603.png" />`;
-    generateLives();
-    createHints();
 }
 
 function plantMines(firstClickedI, firstClickedJ) {
@@ -116,7 +111,7 @@ function renderBoard() {
     var elBoard = document.querySelector('.boardContainer');
     elBoard.innerHTML = strHTML;
     var elNumOfminesToReveal = document.querySelector('.numOfminesToReveal');
-    elNumOfminesToReveal.innerText = gNumOfminesToReveal
+    elNumOfminesToReveal.innerText = gLevel.mines
     var elClock = document.querySelector('.clock');
     elClock.innerText = gGame.secsPassed;
 }
@@ -141,8 +136,8 @@ function cellClicked(event, cellI, cellJ) {
 
         if (cell.isMine && !gGame.hintMode) {
             gGame.lives--;
-            generateLives(); 
-            if (gGame.lives === 0) { 
+            generateLives();
+            if (gGame.lives === 0) {
                 gameOver(false);
             }
         }
@@ -176,10 +171,10 @@ function expandShown(cellI, cellJ) {
 function cellMarked(cellI, cellJ) {
     if (gBoard[cellI][cellJ].isMarked) {
         gBoard[cellI][cellJ].isMarked = false;
-        gNumOfminesToReveal++;
+        gLevel.mines++;
     } else {
         gBoard[cellI][cellJ].isMarked = true;
-        gNumOfminesToReveal--
+        gLevel.mines--
     }
     checkGameOver()
     renderBoard();
@@ -209,7 +204,7 @@ function gameOver(isWon) {
     gGame.isOn = false;
     var elRestartButton = document.querySelector('.restart');
     if (isWon) {
-        localStorageMang();
+        getAndSetBestTime();
         var audioWon = new Audio('/sounds/Cheering.mp3');
         audioWon.play();
         elRestartButton.innerHTML = `<img class="smileyButton" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-sunglasses_1f60e.png" />`;
@@ -258,18 +253,4 @@ function hideRevealedByHint(cellI, cellJ) {
     }, 1000);
 }
 
-function localStorageMang() {
-    switch (gLevel.size) {
-        case 4:
-            localStorage.setItem(`Best Time Beginner`, gGame.secsPassed)
-            break;
-        case 8:
-            localStorage.setItem(`Best Time Medium`, gGame.secsPassed)
-            break;
-        case 12:
-            localStorage.setItem(`Best Time Expert`, gGame.secsPassed)
-            break;
-        default:
-            break;
-    }
-}
+

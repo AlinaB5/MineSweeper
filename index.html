@@ -12,10 +12,11 @@
 <body oncontextmenu="return false;" onload="initGame()">
     <h1 class="topHeading">Mines Sweeper</h1>
     <div class="levelsButtons">
-            <button class="beginnerButton" onclick="setLevel(this)">Beginner</button>
-            <button class="mediumButton" onclick=setLevel(this)>Medium</button>
-            <button class="expertButton" onclick="setLevel(this)">Expert</button>
-        </div>
+        <button class="beginnerButton" onclick="initGame(4)">Beginner</button>
+        <button class="mediumButton" onclick="initGame(8)">Medium</button>
+        <button class="expertButton" onclick="initGame(12)">Expert</button>
+    </div>
+    <span class="bestTime"></span>
     <div class="topMenu">
         <div class="numOfminesToReveal"></div>
         <button class="restart" onclick="initGame()"></button>
@@ -27,7 +28,6 @@
         <span class="hints">
         </span>
     </div>
-    
     <table class="boardContainer">
         <tbody></tbody>
     </table>
