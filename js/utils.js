@@ -77,12 +77,11 @@ function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function getRandomLocation() {
-  var location = {
-    i: getRandomNumber(0, gLevel.size - 1),
-    j: getRandomNumber(0, gLevel.size - 1)
-  };
-  return location
+function getRandomLoc(arr) {
+  var i = getRandomNumber(0, arr.length);
+  var cell = arr[i];
+  arr.splice(i, 1);
+  return cell;
 }
 
 function clock() {

@@ -25,7 +25,7 @@ var gBoard,
     gBestMediumTime,
     gBestExpertTime;
 
-function initGame(size=gLevel.size) {
+function initGame(size = gLevel.size) {
     gGame.isOn = true;
     setLevel(size)
     gGame.secsPassed = 0;
@@ -42,24 +42,21 @@ function initGame(size=gLevel.size) {
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-open-mouth_1f603.png" />`;
 }
 
-function plantMines(firstClickedI, firstClickedJ) {
-    for (var i = 0; i < gLevel.mines; i++) {
-        var mineLocation = getRandomLocation();
-        //if it wasn't a mine before and if its not the first clicked put it there 
-        if (!gBoard[mineLocation.i][mineLocation.j].isMine && gBoard[mineLocation.i][mineLocation.j] !== gBoard[firstClickedI][firstClickedJ]) {
-            gBoard[mineLocation.i][mineLocation.j].isMine = true;
-        } else {
-            i--;
-        }
-    }
-}
-
-function setMinesNegsCount() {
+function findPossibleMineLocs(firstI, firstJ) {
+    var possibleMines = []
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[i].length; j++) {
-            var cell = gBoard[i][j]
-            cell.minesAroundCount = getMinesCount(i, j);
+            if (((i >= firstI - 1) && (i <= firstI + 1)) && ((j >= firstJ - 1) && (j <= firstJ + 1))) continue
+            possibleMines.push(gBoard[i][j])
         }
+    }
+    return setMines(possibleMines)
+}
+
+function setMines(possibleMines) {
+    for (var i = 0; i < gLevel.mines; i++) {
+        var cell = getRandomLoc(possibleMines)
+        cell.isMine = true;
     }
 }
 
@@ -75,6 +72,15 @@ function getMinesCount(cellI, cellJ) {
         }
     }
     return minesCount;
+}
+
+function setMinesNegsCount() {
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[i].length; j++) {
+            var cell = gBoard[i][j]
+            cell.minesAroundCount = getMinesCount(i, j);
+        }
+    }
 }
 
 function renderBoard() {
@@ -121,7 +127,7 @@ function cellClicked(event, cellI, cellJ) {
         if (!gClockInterval) {
             gStartTime = Date.now();
             gClockInterval = setInterval(clock, 100);
-            plantMines(cellI, cellJ);
+            findPossibleMineLocs(cellI, cellJ);
             setMinesNegsCount();
         }
         if (event.button === 2) return cellMarked(cellI, cellJ);
