@@ -13,9 +13,10 @@ var gGame = {
     shownCount: 0,
     markedCount: 0,
     secsPassed: 0,
-    hintMode: false,
     lives: 0,
     safeClicks: 0,
+    hintMode: false,
+    manualMode: true
 }
 
 var gBoard,
@@ -44,7 +45,7 @@ function initGame(size = gLevel.size) {
     src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/232/smiling-face-with-open-mouth_1f603.png" />`;
     var elSafeClickButn = document.querySelector('.safeClickButn');
     elSafeClickButn.innerText = `You have ${gGame.safeClicks} safe clicks`
-    elSafeClickButn.disabled =false;
+    elSafeClickButn.disabled = false;
 }
 
 function findPossibleMineLocs(firstI, firstJ) {
@@ -276,7 +277,7 @@ function showSafeClick() {
     gGame.safeClicks--;
     if (gGame.safeClicks >= 0) {
         elSafeClickButn.innerText = `You have ${gGame.safeClicks} safe clicks`
-        if (gGame.safeClicks === 0) elSafeClickButn.disabled =true;
+        if (gGame.safeClicks === 0) elSafeClickButn.disabled = true;
         var possibleSafeClicks = getSafeClicks();
         var randLocForSafeClick = getRandomLoc(possibleSafeClicks);
         randLocForSafeClick.isSafe = true;
@@ -288,7 +289,7 @@ function showSafeClick() {
     }
 }
 
-function getSafeClicks() {-+++++++++++++++++-
+function getSafeClicks() {
     var possibleSafeClicks = []
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[i].length; j++) {
@@ -296,4 +297,8 @@ function getSafeClicks() {-+++++++++++++++++-
         }
     }
     return possibleSafeClicks;
+}
+
+function manualMode() {
+    gGame.isManual = true;
 }
