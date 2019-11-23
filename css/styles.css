@@ -110,7 +110,7 @@ td.SAFE {
     margin-inline-start: 10px;
 }
 
-.hints_lives {
+.hints_lives_manualMode {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -128,7 +128,6 @@ td.SAFE {
 
 
 .lives {
-    border: 2px solid#325d63;
     width: auto;
     min-width: 60px;
     height: 20px;
@@ -136,6 +135,20 @@ td.SAFE {
     background-color: #ffffffbe;
     border: 1px solid rgb(202, 230, 224);
     border-radius: 6px;
+}
+
+.manualMode{
+    width: auto;
+    min-width: 60px;
+    height: 22px;
+    margin-top: 10px;
+    background-color: #ffffffbe;
+    border: 1px solid rgb(202, 230, 224);
+    border-radius: 6px;
+    color: #666666;
+    font-family: Arial;
+    font-size: 15px;
+    font-weight: bold;
 }
 
 .divSafeClickButn{
@@ -258,4 +271,8 @@ td.SAFE {
 .expertButton :active {
     position: relative;
     top: 1px;
+}
+
+.hidden{
+    display: none; 
 }

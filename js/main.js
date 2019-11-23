@@ -25,7 +25,8 @@ var gBoard,
     gUsedHintsCount,
     gBestBeginnerTime,
     gBestMediumTime,
-    gBestExpertTime;
+    gBestExpertTime,
+    gMinesToFind;
 
 function initGame(size = gLevel.size) {
     gGame.isOn = true;
@@ -34,6 +35,7 @@ function initGame(size = gLevel.size) {
     gGame.lives = 3;
     gGame.safeClicks = 3;
     gUsedHintsCount = 0;
+    gMinesToFind = gLevel.mines;
     buildBoard();
     renderBoard();
     clearInterval(gClockInterval);
@@ -46,6 +48,9 @@ function initGame(size = gLevel.size) {
     var elSafeClickButn = document.querySelector('.safeClickButn');
     elSafeClickButn.innerText = `You have ${gGame.safeClicks} safe clicks`
     elSafeClickButn.disabled = false;
+    var elManualModeButn = document.querySelector('.manualMode');
+    elManualModeButn.innerText = `🛠️`;
+    elManualModeButn.classList.remove('hidden')
 }
 
 function findPossibleMineLocs(firstI, firstJ) {
@@ -56,10 +61,10 @@ function findPossibleMineLocs(firstI, firstJ) {
             possibleMines.push(gBoard[i][j])
         }
     }
-    return setMines(possibleMines)
+    return placeMines(possibleMines)
 }
 
-function setMines(possibleMines) {
+function placeMines(possibleMines) {
     for (var i = 0; i < gLevel.mines; i++) {
         var cell = getRandomLoc(possibleMines)
         cell.isMine = true;
@@ -115,9 +120,6 @@ function renderBoard() {
                 if (cell.isMarked) {
                     strHTML += `\t<td class="${className}" onmousedown="cellClicked(event,${i}, ${j})">${FLAG}</td>\n`
                 }
-                // else if (cell.isSafe) {
-                //     strHTML += `\t<td class="${className}" onmousedown="cellClicked(event,${i}, ${j})"></td>\n`
-                // } 
                 else {
                     strHTML += `\t<td class="${className}" onmousedown="cellClicked(event,${i}, ${j})"></td>\n`
                 }
@@ -128,14 +130,14 @@ function renderBoard() {
     var elBoard = document.querySelector('.boardContainer');
     elBoard.innerHTML = strHTML;
     var elNumOfminesToReveal = document.querySelector('.numOfminesToReveal');
-    elNumOfminesToReveal.innerText = gLevel.mines
+    elNumOfminesToReveal.innerText = gMinesToFind
     var elClock = document.querySelector('.clock');
     elClock.innerText = gGame.secsPassed;
 }
 
 function cellClicked(event, cellI, cellJ) {
     if (gGame.isOn) {
-        if (!gClockInterval) {
+        if (!gClockInterval && !gGame.isManual) {
             gStartTime = Date.now();
             gClockInterval = setInterval(clock, 100);
             findPossibleMineLocs(cellI, cellJ);
@@ -145,11 +147,6 @@ function cellClicked(event, cellI, cellJ) {
 
         var cell = gBoard[cellI][cellJ];
         if (cell.isMarked) return;
-        if (gGame.hintMode) {
-            cell.tempShown = true;
-        } else if (!cell.isShown) {
-            cell.isShown = true;
-        }
 
         if (cell.isMine && !gGame.hintMode) {
             gGame.lives--;
@@ -159,12 +156,21 @@ function cellClicked(event, cellI, cellJ) {
             }
         }
 
+        if (gGame.hintMode) {
+            cell.tempShown = true;
+        } else if (gGame.isManual) {
+            manualMode(cell);
+        } else if (!cell.isShown) {
+            cell.isShown = true;
+        }
+
         if ((cell.minesAroundCount === 0 && !cell.isMine) || gGame.hintMode) expandShown(cellI, cellJ);
 
         checkGameOver();
         renderBoard();
     }
 }
+
 
 function expandShown(cellI, cellJ) {
     for (var i = cellI - 1; i <= cellI + 1; i++) {
@@ -279,13 +285,16 @@ function showSafeClick() {
         elSafeClickButn.innerText = `You have ${gGame.safeClicks} safe clicks`
         if (gGame.safeClicks === 0) elSafeClickButn.disabled = true;
         var possibleSafeClicks = getSafeClicks();
-        var randLocForSafeClick = getRandomLoc(possibleSafeClicks);
-        randLocForSafeClick.isSafe = true;
-        setTimeout(function () {
-            randLocForSafeClick.isSafe = false;
+        if (possibleSafeClicks.length > 0) {
+            var randLocForSafeClick = getRandomLoc(possibleSafeClicks);
+            randLocForSafeClick.isSafe = true;
+            setTimeout(function () {
+                randLocForSafeClick.isSafe = false;
+                renderBoard();
+            }, 500)
             renderBoard();
-        }, 500)
-        renderBoard();
+        }
+        else { elSafeClickButn.innerText = `Nothing is safe` }
     }
 }
 
@@ -299,6 +308,20 @@ function getSafeClicks() {
     return possibleSafeClicks;
 }
 
-function manualMode() {
+function activateManualMode() {
     gGame.isManual = true;
+}
+function manualMode(cell) {
+    gLevel.mines--;
+    if (gLevel.mines >= 0) {
+        cell.isMine = true;
+        var elManualModeButn = document.querySelector('.manualMode');
+        elManualModeButn.innerText = `${gLevel.mines} to set`;
+        if (gLevel.mines === 0) {
+            gGame.isManual = false;
+            elManualModeButn.classList.add('hidden');
+            setMinesNegsCount();
+            renderBoard();
+        }
+    }
 }

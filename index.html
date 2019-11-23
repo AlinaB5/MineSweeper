@@ -19,17 +19,19 @@
     <span class="bestTime"></span>
     <div class="topMenu">
         <div class="numOfminesToReveal"></div>
-        <button class="restart" onclick="initGame()"></button>
+        <button class="restart ui-tooltip" title="restart" onclick="initGame()"></button>
         <div class="clock"></div>
     </div>
-    <div class="hints_lives">
-        <span class="lives">
+    <div class="hints_lives_manualMode">
+        <span class="lives ui-tooltip" title="your lives">
         </span>
-        <span class="hints">
+        <span class="hints ui-tooltip" title="use a hint">
         </span>
+        <button class="manualMode ui-tooltip" title="manual mode - place mines and play" onclick ="activateManualMode()">🛠️
+        </button>
     </div>
     <div class="divSafeClickButn">
-        <button class="safeClickButn" onclick="showSafeClick()"></button>
+        <button class="safeClickButn ui-tooltip" title="shows a place without a bomb" onclick="showSafeClick()"></button>
     </div>
     <table class="boardContainer">
         <tbody></tbody>
@@ -39,3 +41,4 @@
 </body>
 
 </html>
+
