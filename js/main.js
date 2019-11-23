@@ -148,7 +148,7 @@ function cellClicked(event, cellI, cellJ) {
         var cell = gBoard[cellI][cellJ];
         if (cell.isMarked) return;
 
-        if (cell.isMine && !gGame.hintMode) {
+        if (cell.isMine && !gGame.hintMode && !gGame.isManual) {
             gGame.lives--;
             generateLives();
             if (gGame.lives === 0) {
@@ -197,10 +197,10 @@ function expandShown(cellI, cellJ) {
 function cellMarked(cellI, cellJ) {
     if (gBoard[cellI][cellJ].isMarked) {
         gBoard[cellI][cellJ].isMarked = false;
-        gLevel.mines++;
+        gMinesToFind++;
     } else {
         gBoard[cellI][cellJ].isMarked = true;
-        gLevel.mines--
+        gMinesToFind--
     }
     checkGameOver()
     renderBoard();
@@ -309,19 +309,28 @@ function getSafeClicks() {
 }
 
 function activateManualMode() {
+    var elManualModeButn = document.querySelector('.manualMode');
+    elManualModeButn.innerText = `${gLevel.mines} mines to set`;
     gGame.isManual = true;
 }
+
 function manualMode(cell) {
-    gLevel.mines--;
+    if (!cell.isMine) gLevel.mines--;
+
     if (gLevel.mines >= 0) {
         cell.isMine = true;
+        cell.tempShown = true;
+        setTimeout(function () {
+            cell.tempShown = false;
+            renderBoard();
+        }, 1000);
         var elManualModeButn = document.querySelector('.manualMode');
-        elManualModeButn.innerText = `${gLevel.mines} to set`;
+        elManualModeButn.innerText = `${gLevel.mines} mines to set`;
         if (gLevel.mines === 0) {
-            gGame.isManual = false;
             elManualModeButn.classList.add('hidden');
             setMinesNegsCount();
             renderBoard();
+            gGame.isManual = false;
         }
     }
 }
