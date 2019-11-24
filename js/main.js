@@ -142,6 +142,8 @@ function cellClicked(event, cellI, cellJ) {
             gClockInterval = setInterval(clock, 100);
             findPossibleMineLocs(cellI, cellJ);
             setMinesNegsCount();
+            var elManualModeButn = document.querySelector('.manualMode');
+            elManualModeButn.classList.add('hidden')
         }
         if (event.button === 2) return cellMarked(cellI, cellJ);
 
