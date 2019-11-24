@@ -16,7 +16,7 @@ var gGame = {
     lives: 0,
     safeClicks: 0,
     hintMode: false,
-    manualMode: true
+    manualMode: false
 }
 
 var gBoard,
